@@ -33,6 +33,10 @@ const server = new GraphQLServer({
   resolvers
 });
 
-server.start(() => {
-  console.log('The server is running but not on the treadmill');
+const options = {
+  port: 8000
+};
+
+server.start(options, ({ port }) => {
+  console.log(`The server is running on port ${port} but not on the treadmill`);
 });
