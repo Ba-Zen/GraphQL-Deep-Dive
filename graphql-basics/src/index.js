@@ -3,18 +3,40 @@ import { GraphQLServer } from 'graphql-yoga';
 // Scalar Types - String, Boolean, Int, Float, ID
 
 // Demo user data
+const users = [
+  {
+    id: '1',
+    name: 'Bazen',
+    email: 'bazen@bazen.com',
+    age: 26
+  },
+  {
+    id: '2',
+    name: 'Barry',
+    email: 'barray@barry.com',
+    age: 29
+  },
+  {
+    id: '3',
+    name: 'Shazam',
+    email: 'shazam@shazam.com',
+    age: 109
+  }
+];
 const posts = [
   {
     id: '1',
     title: 'Guide To Eggs',
     body: 'Lorem ipsum doe',
-    published: true
+    published: true,
+    author: '1'
   },
   {
     id: '2',
     title: 'How to be a caveman',
     body: 'Hello, farewell to youu my frieeeennnd! - Issa Barney song',
-    published: false
+    published: false,
+    author: '1'
   },
   {
     id: '3',
@@ -22,13 +44,15 @@ const posts = [
       'What to do with two lemons when life puts them in your Christmas stockings',
     body:
       'Tell me what you want, what you really, really want. i"ll tell ya what I want what I really really want- Spice Girls',
-    published: true
+    published: true,
+    author: '3'
   }
 ];
 
 // Type definitions (schema)
 const typeDefs = `
     type Query {
+        users(query: String): [User!]!
         posts(query: String): [Post!]!
         me: User!
         post: Post!
@@ -46,12 +70,22 @@ const typeDefs = `
       title: String!
       body: String!
       published: Boolean!
+      author: User!
     }
 `;
 
 // Resolvers
 const resolvers = {
   Query: {
+    users(parent, args, ctx, info) {
+      if (!args.query) {
+        return users;
+      }
+
+      return users.filter(user => {
+        return user.name.toLowerCase().includes(args.query.toLowerCase());
+      });
+    },
     posts(parent, args, ctx, info) {
       if (!args.query) {
         return posts;
@@ -81,6 +115,13 @@ const resolvers = {
         body: 'boil eggs',
         published: true
       };
+    }
+  },
+  Post: {
+    author(parent, args, ctx, info) {
+      return users.find(user => {
+        return user.id === parent.author;
+      });
     }
   }
 };
