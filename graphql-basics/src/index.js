@@ -2,12 +2,34 @@ import { GraphQLServer } from 'graphql-yoga';
 
 // Scalar Types - String, Boolean, Int, Float, ID
 
+// Demo user data
+const posts = [
+  {
+    id: '1',
+    title: 'Guide To Eggs',
+    body: 'Lorem ipsum doe',
+    published: true
+  },
+  {
+    id: '2',
+    title: 'How to be a caveman',
+    body: 'Hello, farewell to youu my frieeeennnd! - Issa Barney song',
+    published: false
+  },
+  {
+    id: '3',
+    title:
+      'What to do with two lemons when life puts them in your Christmas stockings',
+    body:
+      'Tell me what you want, what you really, really want. i"ll tell ya what I want what I really really want- Spice Girls',
+    published: true
+  }
+];
+
 // Type definitions (schema)
 const typeDefs = `
     type Query {
-        grades: [Int!]!
-        add(numbers: [Float!]!): Float!
-        greeting(name: String, position: String): String!
+        posts(query: String): [Post!]!
         me: User!
         post: Post!
     }
@@ -30,24 +52,20 @@ const typeDefs = `
 // Resolvers
 const resolvers = {
   Query: {
-    grades(parent, args, ctx, info) {
-      return [100, 94, 100];
-    },
-    add(parent, args, ctx, info) {
-      if (args.numbers.length === 0) {
-        return 0;
+    posts(parent, args, ctx, info) {
+      if (!args.query) {
+        return posts;
       }
 
-      return args.numbers.reduce((accumulator, currentValue) => {
-        return accumulator + currentValue;
+      return posts.filter(posts => {
+        const isTitleMatch = posts.title
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+        const isBodyMatch = posts.body
+          .toLowerCase()
+          .includes(args.query.toLowerCase());
+        return isTitleMatch || isBodyMatch;
       });
-    },
-    greeting(parent, args, ctx, info) {
-      if (args.name && args.position) {
-        return `Hello, ${args.name}! You are my favorite ${args.position}!`;
-      } else {
-        return 'Hello!';
-      }
     },
     me() {
       return {
