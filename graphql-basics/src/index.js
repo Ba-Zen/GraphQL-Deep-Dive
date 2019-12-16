@@ -25,21 +25,21 @@ const users = [
 ];
 const posts = [
   {
-    id: '1',
+    id: '10',
     title: 'Guide To Eggs',
     body: 'Lorem ipsum doe',
     published: true,
     author: '1'
   },
   {
-    id: '2',
+    id: '11',
     title: 'How to be a caveman',
     body: 'Hello, farewell to youu my frieeeennnd! - Issa Barney song',
     published: false,
     author: '1'
   },
   {
-    id: '3',
+    id: '12',
     title:
       'What to do with two lemons when life puts them in your Christmas stockings',
     body:
@@ -53,22 +53,26 @@ const comments = [
   {
     id: '101',
     text: 'This is insightful, will try this',
-    author: '2'
+    author: '2',
+    post: '10'
   },
   {
     id: '102',
     text: 'Cool spin on this, enjoy your perspective!',
-    author: '2'
+    author: '2',
+    post: '10'
   },
   {
     id: '103',
     text: 'I enjoyed the part about butter. - S',
-    author: '3'
+    author: '3',
+    post: '11'
   },
   {
     id: '104',
     text: 'I do not enjoy reading but read all your work! - S',
-    author: '3'
+    author: '3',
+    post: '11'
   }
 ];
 
@@ -97,12 +101,14 @@ const typeDefs = `
       body: String!
       published: Boolean!
       author: User!
+      comments: [Comment!]!
     }
 
     type Comment {
       id: ID!
       text: String!
       author: User!
+      post: Post!
     }
 `;
 
@@ -157,6 +163,23 @@ const resolvers = {
       return users.find(user => {
         return user.id === parent.author;
       });
+    },
+    comments(parent, args, ctx, info) {
+      return comments.filter(comment => {
+        return comment.post === parent.id;
+      });
+    }
+  },
+  Comment: {
+    author(parent, args, ctx, info) {
+      return users.find(user => {
+        return user.id === parent.author;
+      });
+    },
+    post(parent, args, ctx, info) {
+      return posts.find(post => {
+        return post.id === parent.post;
+      });
     }
   },
   User: {
@@ -168,13 +191,6 @@ const resolvers = {
     comments(parent, args, ctx, info) {
       return comments.filter(comment => {
         return comment.author === parent.id;
-      });
-    }
-  },
-  Comment: {
-    author(parent, args, ctx, info) {
-      return users.find(user => {
-        return user.id === parent.author;
       });
     }
   }
