@@ -30,54 +30,37 @@ const createPostForUser = async (authorId, data) => {
   return user;
 };
 
-createPostForUser('ck4vt1whw00si0720gdgywk7l', {
-  title: 'Great books to read',
-  body: 'The War Of Art',
-  published: true
-}).then(user => {
-  console.log(JSON.stringify(user, undefined, 2));
-});
+// createPostForUser('ck4vt1whw00si0720gdgywk7l', {
+//   title: 'Great books to read',
+//   body: 'The War Of Art',
+//   published: true
+// }).then(user => {
+//   console.log(JSON.stringify(user, undefined, 2));
+// });
 
-// prisma.mutation
-//   .createPost(
-//     {
-//       data: {
-//         title: 'Graphql 101',
-//         body: '',
-//         published: false,
-//         author: {
-//           connect: {
-//             id: 'ck4vt1whw00si0720gdgywk7l'
-//           }
-//         }
-//       }
-//     },
-//     '{ id title body published }'
-//   )
-//   .then(data => {
-//     console.log(data);
-//     return prisma.query.users(null, '{ id name posts { id title } }');
-//   })
-//   .then(data => {
-//     console.log(JSON.stringify(data, undefined, 2));
-//   });
+const updatePostForUser = async (postId, data) => {
+  const post = await prisma.mutation.updatePost(
+    {
+      where: {
+        id: postId
+      },
+      data
+    },
+    '{ author { id } }'
+  );
+  const user = await prisma.query.user(
+    {
+      where: {
+        id: post.author.id
+      }
+    },
+    '{ id name email posts { id title published } }'
+  );
+  return user;
+};
 
-// prisma.mutation
-//   .updatePost(
-//     {
-//       where: {
-//         id: 'ck4wyrkzl016u0720soi6zq38'
-//       },
-//       data: {
-//         body: 'This is how to get going',
-//         published: true
-//       }
-//     },
-//     '{ id }'
-//   )
-//   .then(data => {
-//     return prisma.query.posts(null, '{id title body published }');
-//   })
-//   .then(data => {
-//     console.log(data);
-//   });
+// updatePostForUser('ck4wzf6t801av0720a46w9or0', { published: false }).then(
+//   user => {
+//     console.log(JSON.stringify(user, undefined, 2));
+//   }
+// );
